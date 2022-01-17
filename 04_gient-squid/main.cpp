@@ -39,7 +39,7 @@ int part01(const char* path, int playerNum) {
     
     // 게임 판 읽기
     int board[playerNum][25];
-    int totalSum[playerNum];
+    int totalSum[playerNum] = {};
     int player = 0;
     while(getline(ifs, line)) {
         vector<string> strPan;
