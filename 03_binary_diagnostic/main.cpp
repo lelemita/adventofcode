@@ -53,14 +53,14 @@ int part01(const char* path) {
     return gamma * epsilon;
 }
 
-int part02(const char* path, int len) {
+int part02(const char* path, int totalLen) {
     ifstream ifs(path, ios::in);
     if (ifs.fail()) {
         cout << "input file error" << endl;
         return -1;
     }
 
-    string lines[len];
+    string lines[totalLen];
     string line;
     int i = 0;
     while(getline(ifs, line)) {
@@ -68,17 +68,11 @@ int part02(const char* path, int len) {
     }
 
     int begin = 0;
-    int end = len;
+    int end = totalLen;
     int jdx = 0;
-    int count = 0;
-    while (count++ < 7) {
+    while (true) {
         int middle = (begin + end) / 2;
         sort(&lines[begin], &lines[end]);  
-        // cout << "------- " << jdx << " : " << begin << "-" << end << endl;
-        // for (int k = begin; k < end; k++) 
-        // {
-        //     cout << k << " : " << lines[k] << endl;
-        // }
         int save = begin;
         // while (lines[begin++][jdx] == '0') {}
         while (true) {
@@ -89,20 +83,44 @@ int part02(const char* path, int len) {
             begin += 1;
         }
 
-        if (begin <= middle) {
-            // cout << " 대세는 1" << endl;
-            // begin -= 1;
-        } else {
-            // cout << " Win Zero " << begin << " : " << middle << endl;
+        if (begin > middle) {
             end = begin;
             begin = save;
         }
-        if (end - begin == 0) {
+        if (end - begin == 1) {
             break;
         }
         jdx = (jdx == line.length() -1)? 0 : ++jdx;
     }
-    return binToDecimal(lines[begin]);
+    int oxygen = binToDecimal(lines[begin]);
+
+
+    begin = 0;
+    end = totalLen;
+    jdx = 0;
+    while (true) {
+        int middle = (begin + end) / 2;
+        sort(&lines[begin], &lines[end]);  
+        int save = begin;
+        while (true) {
+            char ch = lines[begin][jdx];
+            if (ch == '1') {
+                break;
+            }
+            begin += 1;
+        }
+
+        if (begin <= middle) {
+            end = begin;
+            begin = save;
+        }
+        if (end - begin == 1) {
+            break;
+        }
+        jdx = (jdx == line.length() -1)? 0 : ++jdx;
+    }
+    int carbonDioxide = binToDecimal(lines[begin]);
+    return oxygen * carbonDioxide;
 }
 
 int main(void)
@@ -111,8 +129,8 @@ int main(void)
     cout << part01(course1) << endl;
     cout << part02(course1, 12) << endl;
 
-    // const char* course2 = "../input";
-    // cout << part01(course2) << endl;
-    // cout << part02(course2) << endl;
+    const char* course2 = "../input";
+    cout << part01(course2) << endl;
+    cout << part02(course2, 1000) << endl;
     return 0;
 }
