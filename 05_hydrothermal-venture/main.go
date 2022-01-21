@@ -88,7 +88,7 @@ func part02(path string) {
 
 	counts := map[string]int{}
 	for _, line := range lines {
-		fmt.Println(line)
+		// fmt.Println(line)
 		strPs := strings.FieldsFunc(line, split)
 		p := [4]int{}
 		for i := 0; i < 4; i++ {
@@ -107,12 +107,12 @@ func part02(path string) {
 		} else if isSameAbs(p[0]-p[2], p[1]-p[3]) {
 			start, end := compareInt(p[1], p[3])
 			dif := end - start
-			dx := (p[3] - p[1]) / dif
-			dy := (p[2] - p[0]) / dif
-			fmt.Println("  ", dx, dy, dif)
+			dy := (p[3] - p[1]) / dif
+			dx := (p[2] - p[0]) / dif
+			// fmt.Println("  ", dx, dy, dif)
 			for i := 0; i <= end-start; i++ {
-				counts[fmt.Sprintf("%d,%d", p[0]+(dx*i), p[1]+(dy*i))] += 1
-				fmt.Printf("  %d,%d\n", p[0]+(dx*i), p[1]+(dy*i))
+				counts[fmt.Sprintf("%d,%d", p[1]+(dy*i), p[0]+(dx*i))] += 1
+				// fmt.Printf("  %d,%d\n", p[0]+(dx*i), p[1]+(dy*i))
 			}
 		}
 	}
@@ -126,8 +126,8 @@ func part02(path string) {
 }
 
 func main() {
-	// part01("./example")
-	// part01("./input")
+	part01("./example")
+	part01("./input")
 	part02("./example")
-	// part02("./input")
+	part02("./input")
 }
