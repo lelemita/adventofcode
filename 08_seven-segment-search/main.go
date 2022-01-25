@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -40,12 +41,37 @@ func part01(exs, vals []string) int {
 	return count
 }
 
+func part02(exs, vals []string) int {
+	count := 0
+	if bi, err := strconv.ParseInt("001001", 2, 64); err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(bi)
+		fmt.Println(2 | bi)
+	}
+
+	// 1: 길이2
+	// 7: 길이3
+	// 4: 길이4
+	// 8: 길이7
+	// 길이5 중(2,3,5)에서
+	//	 1성분 다 있으면: 3
+	//	 없는 거 중에서
+	//		4-X == 1 : 5
+	//	 	4-X == 2 : 2
+	// 길이6 중(6,9,0)에서
+	//	 4-X == 0 : 9
+	//	 4-X == 1 : 0
+	//	 4-X == 3 : 6
+	return count
+}
+
 func main() {
 	exs, vals := readInput("example.txt")
-	fmt.Println(part01(exs, vals))
-	// 	fmt.Println(part02(example))
+	// fmt.Println(part01(exs, vals))
+	fmt.Println(part02(exs, vals))
 
-	exs, vals = readInput("input.txt")
-	fmt.Println(part01(exs, vals))
-	// 	fmt.Println(part02(puzzle))
+	// exs, vals = readInput("input.txt")
+	// fmt.Println(part01(exs, vals))
+	// fmt.Println(part02(exs, vals))
 }
