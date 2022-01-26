@@ -60,39 +60,41 @@ func decode(code string, exs *string) int {
 			four = val
 		}
 	}
-	if len(code) == 5 {
-		if strings.Contains(code, string(one[0])) && strings.Contains(code, string(one[1])) {
+
+	if strings.Contains(code, string(one[0])) && strings.Contains(code, string(one[1])) {
+		if len(code) == 5 {
 			return 3
 		}
-		count := len(four)
-		for _, f := range four {
-			for _, x := range code {
-				if x == f {
-					count -= 1
-					if count == 1 {
-						return 5
-					}
-				}
-			}
+		switch diff(four, code) {
+		case 0:
+			return 9
+		case 1:
+			return 0
 		}
-		return 2
+	} else {
+		if len(code) == 6 {
+			return 6
+		}
+		switch diff(four, code) {
+		case 1:
+			return 5
+		case 2:
+			return 2
+		}
 	}
-	// len(code) == 6
-	if strings.Contains(code, string(one[0])) != strings.Contains(code, string(one[1])) {
-		return 6
-	}
-	count := len(four)
-	for _, f := range four {
-		for _, x := range code {
+	return -10000
+}
+
+func diff(from, target string) int {
+	count := len(from)
+	for _, f := range from {
+		for _, x := range target {
 			if x == f {
 				count -= 1
-				if count == 0 {
-					return 9
-				}
 			}
 		}
 	}
-	return 0
+	return count
 }
 
 func part02(exs, vals []string) int {
