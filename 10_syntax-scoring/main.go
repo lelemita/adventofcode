@@ -5,9 +5,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 )
-
-const WALL = byte('9')
 
 func readInput(path string) [][]byte {
 	file, err := os.Open(path)
@@ -27,12 +26,6 @@ func readInput(path string) [][]byte {
 	return output
 }
 
-var score = map[byte]int{
-	byte(')'): 3,
-	byte('}'): 1197,
-	byte(']'): 57,
-	byte('>'): 25137,
-}
 var pair = map[byte]byte{
 	byte(')'): byte('('),
 	byte('}'): byte('{'),
@@ -40,8 +33,16 @@ var pair = map[byte]byte{
 	byte('>'): byte('<'),
 }
 
-func part01(input [][]byte) int {
+func part01(input [][]byte) ([][]byte, int) {
+	var score = map[byte]int{
+		byte(')'): 3,
+		byte(']'): 57,
+		byte('}'): 1197,
+		byte('>'): 25137,
+	}
+
 	result := 0
+	after := [][]byte{}
 	for _, line := range input {
 		stack := []byte{}
 		isCorrupted := byte(0)
@@ -52,7 +53,6 @@ func part01(input [][]byte) int {
 				n := len(stack) - 1
 				if stack[n] != pair[p] {
 					isCorrupted = p
-					// fmt.Printf("(%2d,%2d) %s %s\n", i, j, stack, []byte{p})
 					break Loop
 				}
 				stack = stack[:n]
@@ -62,21 +62,53 @@ func part01(input [][]byte) int {
 		}
 		if isCorrupted != 0 {
 			result += score[isCorrupted]
+		} else {
+			after = append(after, line)
 		}
 	}
-	return result
+	return after, result
+}
+
+func part02(input [][]byte) int {
+	var score = map[byte]int{
+		byte('('): 1,
+		byte('['): 2,
+		byte('{'): 3,
+		byte('<'): 4,
+	}
+
+	results := []int{}
+	for _, line := range input {
+		stack := []byte{}
+		for _, p := range line {
+			switch p {
+			case byte(')'), byte('>'), byte(']'), byte('}'):
+				n := len(stack) - 1
+				stack = stack[:n]
+			default:
+				stack = append(stack, p)
+			}
+		}
+		res := 0
+		for i := len(stack) - 1; i >= 0; i-- {
+			res *= 5
+			res += score[stack[i]]
+		}
+		// fmt.Printf("%d %s \n", res, stack)
+		results = append(results, res)
+	}
+	sort.Ints(results)
+	return results[len(input)/2]
 }
 
 func main() {
-	// fmt.Println(byte('('), byte(')'))
-	// fmt.Println(byte('<'), byte('>'))
-	// fmt.Println(byte('['), byte(']'))
-	// fmt.Println(byte('{'), byte('}'))
-
 	input := readInput("example.txt")
-	fmt.Println(part01(input))
-	// fmt.Println(part02(input))
+	input, res01 := part01(input)
+	fmt.Println(res01)
+	fmt.Println(part02(input))
+
 	input = readInput("input.txt")
-	fmt.Println(part01(input))
-	// fmt.Println(part02(input))
+	input, res01 = part01(input)
+	fmt.Println(res01)
+	fmt.Println(part02(input))
 }
