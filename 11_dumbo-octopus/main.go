@@ -29,44 +29,20 @@ func readInput(path string) [][]int {
 
 func part01(input [][]int) int {
 	result := 0
-	maxI := len(input) - 1
-	for s := 0; s <= 5; s++ {
-		for _, v := range input {
-			fmt.Printf("%v\n", v)
-		}
-		fmt.Println()
+	for s := 0; s < 100; s++ {
+		// for _, v := range input {
+		// 	fmt.Printf("%v\n", v)
+		// }
+		// fmt.Println()
 
+		var memo = map[string]bool{}
 		for i, line := range input {
-			var arrI []int
-			if i == 0 {
-				arrI = []int{0, 1}
-			} else if i == maxI {
-				arrI = []int{i - 1, i}
-			} else {
-				arrI = []int{i - 1, i, i + 1}
-			}
-			maxJ := len(line) - 1
-			for j, p := range line {
-				if p < 9 {
-					input[i][j] += 1
-					continue
-				}
-				var arrJ []int
-				if j == 0 {
-					arrJ = []int{0, 1}
-				} else if j == maxJ {
-					arrJ = []int{j - 1, j}
-				} else {
-					arrJ = []int{j - 1, j, j + 1}
-				}
-				for _, y := range arrI {
-					for _, x := range arrJ {
-						input[y][x] += 1
-					}
-				}
+			for j := range line {
+				flash(&input, i, j, &memo)
 			}
 		}
 
+		// 결과확인
 		for i, line := range input {
 			for j, p := range line {
 				if p > 9 {
@@ -79,13 +55,54 @@ func part01(input [][]int) int {
 	return result
 }
 
+func flash(input *[][]int, i, j int, memo *map[string]bool) {
+	key := fmt.Sprintf("%d,%d", i, j)
+	if _, ex := (*memo)[key]; ex {
+		return
+	} else if (*input)[i][j] < 9 {
+		(*input)[i][j] += 1
+		return
+	}
+
+	(*memo)[key] = true
+	maxI := len(*input) - 1
+	var arrI []int
+	if i == 0 {
+		arrI = []int{0, 1}
+	} else if i == maxI {
+		arrI = []int{i - 1, i}
+	} else {
+		arrI = []int{i - 1, i, i + 1}
+	}
+
+	var arrJ []int
+	if j == 0 {
+		arrJ = []int{0, 1}
+	} else if j == len((*input)[i])-1 {
+		arrJ = []int{j - 1, j}
+	} else {
+		arrJ = []int{j - 1, j, j + 1}
+	}
+
+	for _, y := range arrI {
+		for _, x := range arrJ {
+			if i == y && j == x {
+				(*input)[y][x] += 1
+			} else {
+				flash(input, y, x, memo)
+			}
+		}
+	}
+}
+
 func main() {
 	// input := readInput("sample.txt")
+	// fmt.Println(part01(input))
 	input := readInput("example.txt")
 	fmt.Println(part01(input))
 	// fmt.Println(part02(input))
 
-	// input = readInput("input.txt")
-	// fmt.Println(part01(input))
+	input = readInput("input.txt")
+	fmt.Println(part01(input))
 	// fmt.Println(part02(input))
 }
