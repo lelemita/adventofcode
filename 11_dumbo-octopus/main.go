@@ -95,14 +95,39 @@ func flash(input *[][]int, i, j int, memo *map[string]bool) {
 	}
 }
 
+func part02(input [][]int) int {
+	for s := 0; s < 1000; s++ {
+		var memo = map[string]bool{}
+		for i, line := range input {
+			for j := range line {
+				flash(&input, i, j, &memo)
+			}
+		}
+
+		sum := 0
+		for i, line := range input {
+			for j, p := range line {
+				if p > 9 {
+					input[i][j] = 0
+				}
+				sum += input[i][j]
+			}
+		}
+		if sum == 0 {
+			return s + 1
+		}
+	}
+	return -1
+}
+
 func main() {
-	// input := readInput("sample.txt")
-	// fmt.Println(part01(input))
 	input := readInput("example.txt")
 	fmt.Println(part01(input))
-	// fmt.Println(part02(input))
+	input = readInput("example.txt")
+	fmt.Println(part02(input))
 
 	input = readInput("input.txt")
 	fmt.Println(part01(input))
-	// fmt.Println(part02(input))
+	input = readInput("input.txt")
+	fmt.Println(part02(input))
 }
