@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
-var caves = map[string][]string{}
+var partNum = 1
 var count = 0
+var caves = map[string][]string{}
 
 func readInput(path string) map[string][]string {
 	var input = map[string][]string{}
@@ -29,7 +30,8 @@ func readInput(path string) map[string][]string {
 	return input
 }
 
-func part(input map[string][]string) int {
+func part(pa int, input map[string][]string) int {
+	partNum = pa
 	count = 0
 	caves = input
 	pass([]string{}, "start")
@@ -50,9 +52,16 @@ func pass(route []string, here string) {
 }
 
 func chkRoute(route []string, next string) bool {
+	if next == "start" {
+		return false
+	}
 	if []byte(next)[0] > 'Z' {
+		haveTwice := true
+		if partNum == 2 {
+			haveTwice = chkTwice(route)
+		}
 		for _, v := range route {
-			if next == v {
+			if next == v && haveTwice {
 				return false
 			}
 		}
@@ -60,14 +69,28 @@ func chkRoute(route []string, next string) bool {
 	return true
 }
 
-func main() {
-	fmt.Println(part(readInput("./12_passage-pathing/ex01.txt")) == 10)
-	fmt.Println(part(readInput("./12_passage-pathing/ex02.txt")) == 19)
-	fmt.Println(part(readInput("./12_passage-pathing/ex03.txt")) == 226)
-	fmt.Println(part(readInput("./12_passage-pathing/input.txt")))
+func chkTwice(route []string) bool {
+	memo := map[string]bool{}
+	for _, v := range route {
+		if []byte(v)[0] > 'Z' {
+			_, exist := memo[v]
+			if exist {
+				return true
+			}
+			memo[v] = true
+		}
+	}
+	return false
+}
 
-	// fmt.Println(part02(readInput("./12_passage-pathing/ex01.txt")) == 36)
-	// 	fmt.Println(part02(readInput("./12_passage-pathing/ex02.txt")) == 103)
-	// 	fmt.Println(part02(readInput("./12_passage-pathing/ex03.txt")) == 3509)
-	// 	fmt.Println(part02(readInput("./12_passage-pathing/input.txt")))
+func main() {
+	fmt.Println(part(1, readInput("ex01.txt")) == 10)
+	fmt.Println(part(1, readInput("ex02.txt")) == 19)
+	fmt.Println(part(1, readInput("ex03.txt")) == 226)
+	fmt.Println(part(1, readInput("input.txt")) == 4912)
+
+	fmt.Println(part(2, readInput("ex01.txt")) == 36)
+	fmt.Println(part(2, readInput("ex02.txt")) == 103)
+	fmt.Println(part(2, readInput("ex03.txt")) == 3509)
+	fmt.Println(part(2, readInput("input.txt")) == 150004)
 }
