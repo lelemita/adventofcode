@@ -13,8 +13,8 @@ type dot struct {
 }
 
 type fold struct {
-	IsVertical bool
-	Line       int
+	ToLeft bool //false: toUp
+	Num    int
 }
 
 func readInput(path string) ([]dot, []fold) {
@@ -38,22 +38,65 @@ func readInput(path string) ([]dot, []fold) {
 		if strings.Contains(arr[0], "=") {
 			fs := strings.Split(arr[0], "=")
 			num, _ := strconv.Atoi(fs[1])
-			folds = append(folds, fold{IsVertical: strings.Contains(fs[0], "x"), Line: num})
+			folds = append(folds, fold{ToLeft: strings.Contains(fs[0], "x"), Num: num})
 		}
 	}
 	return dots, folds
 }
 
-func part01(dots []dot, folds []fold) int {
-	for _, v := range dots {
-		fmt.Println(v)
+func getSize(dots map[dot]bool) (int, int, int, int) {
+	xMin, yMin, xMax, yMax := 100, 100, 0, 0
+	for d := range dots {
+		if d.X > xMax {
+			xMax = d.X
+		}
+		if d.X < xMin {
+			xMin = d.X
+		}
+		if d.Y > yMax {
+			yMax = d.Y
+		}
+		if d.Y < yMin {
+			yMin = d.Y
+		}
 	}
-	for _, v := range folds {
-		fmt.Println(v)
+	return xMin, yMin, xMax, yMax
+}
+
+func part01(dots []dot, folds []fold) int {
+	for _, f := range folds {
+		newDots := map[dot]bool{}
+		if f.ToLeft {
+			for _, d := range dots {
+				if d.X < f.Num {
+					newDots[dot{X: d.X + (2 * (f.Num - d.X)), Y: d.Y}] = true
+				} else if d.X > f.Num {
+					newDots[dot{X: d.X, Y: d.Y}] = true
+				}
+			}
+		} else {
+			for _, d := range dots {
+				if d.Y < f.Num {
+					newDots[dot{X: d.X, Y: d.Y}] = true
+				} else if d.Y > f.Num {
+					newDots[dot{X: d.X, Y: d.Y - (2 * (d.Y - f.Num))}] = true
+				}
+			}
+		}
+
+		fmt.Println(f)
+		fmt.Println(len(newDots))
+		// for v := range newDots {
+		// 	fmt.Println(v)
+		// }
+		// xMin, yMin, xMax, yMax := getSize(newDots)
+		// fmt.Println(xMin, yMin, xMax, yMax)
+		break
 	}
 	return 0
 }
 
 func main() {
 	part01(readInput("example.txt"))
+	part01(readInput("input.txt"))
 }
