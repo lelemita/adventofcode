@@ -63,9 +63,10 @@ func getSize(dots map[dot]bool) (int, int, int, int) {
 	return xMin, yMin, xMax, yMax
 }
 
-func part01(dots []dot, folds []fold) int {
+func solution(dots []dot, folds []fold) int {
+	var newDots map[dot]bool
 	for _, f := range folds {
-		newDots := map[dot]bool{}
+		newDots = map[dot]bool{}
 		if f.ToLeft {
 			for _, d := range dots {
 				if d.X < f.Num {
@@ -83,20 +84,32 @@ func part01(dots []dot, folds []fold) int {
 				}
 			}
 		}
-
-		fmt.Println(f)
-		fmt.Println(len(newDots))
-		// for v := range newDots {
-		// 	fmt.Println(v)
-		// }
-		// xMin, yMin, xMax, yMax := getSize(newDots)
-		// fmt.Println(xMin, yMin, xMax, yMax)
-		break
+		fmt.Println(f, len(newDots), "------")
+		dots = []dot{}
+		for d := range newDots {
+			dots = append(dots, d)
+		}
+		draw(newDots)
 	}
 	return 0
 }
 
+func draw(dots map[dot]bool) {
+	xMin, yMin, xMax, yMax := getSize(dots)
+	for y := 0; y <= (yMax - yMin); y++ {
+		for x := 0; x <= (xMax - xMin); x++ {
+			if dots[dot{X: x + xMin, Y: y + yMin}] {
+				fmt.Print("#")
+			} else {
+				fmt.Print(".")
+			}
+		}
+		fmt.Println()
+	}
+	fmt.Println()
+}
+
 func main() {
-	part01(readInput("example.txt"))
-	part01(readInput("input.txt"))
+	solution(readInput("example.txt"))
+	// part01(readInput("input.txt"))
 }
