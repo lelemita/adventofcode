@@ -1,3 +1,4 @@
+// part1 방식을 part2로 확장하려다 실패함... 왜?
 package main
 
 import (
@@ -17,8 +18,8 @@ type fold struct {
 	Num    int
 }
 
-func readInput(path string) ([]dot, []fold) {
-	dots := []dot{}
+func readInput(path string) (map[dot]bool, []fold) {
+	dots := map[dot]bool{}
 	folds := []fold{}
 	file, err := os.Open(path)
 	if err != nil {
@@ -33,7 +34,7 @@ func readInput(path string) ([]dot, []fold) {
 		if len(arr) == 2 {
 			x, _ := strconv.Atoi(arr[0])
 			y, _ := strconv.Atoi(arr[1])
-			dots = append(dots, dot{X: x, Y: y})
+			dots[dot{X: x, Y: y}] = true
 		}
 		if strings.Contains(arr[0], "=") {
 			fs := strings.Split(arr[0], "=")
@@ -45,7 +46,7 @@ func readInput(path string) ([]dot, []fold) {
 }
 
 func getSize(dots map[dot]bool) (int, int, int, int) {
-	xMin, yMin, xMax, yMax := 100, 100, 0, 0
+	xMin, yMin, xMax, yMax := 9999, 9999, -9999, -9999
 	for d := range dots {
 		if d.X > xMax {
 			xMax = d.X
@@ -63,42 +64,40 @@ func getSize(dots map[dot]bool) (int, int, int, int) {
 	return xMin, yMin, xMax, yMax
 }
 
-func solution(dots []dot, folds []fold) int {
-	var newDots map[dot]bool
+func solution(dots map[dot]bool, folds []fold) int {
 	for _, f := range folds {
-		newDots = map[dot]bool{}
+		nextDots := map[dot]bool{}
 		if f.ToLeft {
-			for _, d := range dots {
+			for d := range dots {
 				if d.X < f.Num {
-					newDots[dot{X: d.X + (2 * (f.Num - d.X)), Y: d.Y}] = true
+					nextDots[dot{X: d.X + (2 * (f.Num - d.X)), Y: d.Y}] = true
 				} else if d.X > f.Num {
-					newDots[dot{X: d.X, Y: d.Y}] = true
+					nextDots[dot{X: d.X, Y: d.Y}] = true
 				}
 			}
 		} else {
-			for _, d := range dots {
+			for d := range dots {
 				if d.Y < f.Num {
-					newDots[dot{X: d.X, Y: d.Y}] = true
+					nextDots[dot{X: d.X, Y: d.Y}] = true
 				} else if d.Y > f.Num {
-					newDots[dot{X: d.X, Y: d.Y - (2 * (d.Y - f.Num))}] = true
+					nextDots[dot{X: d.X, Y: d.Y - (2 * (d.Y - f.Num))}] = true
 				}
 			}
 		}
-		fmt.Println(f, len(newDots), "------")
-		dots = []dot{}
-		for d := range newDots {
-			dots = append(dots, d)
-		}
-		draw(newDots)
+		fmt.Println(f, len(nextDots), "------")
+		dots = nextDots
 	}
+
+	draw(dots)
 	return 0
 }
 
 func draw(dots map[dot]bool) {
 	xMin, yMin, xMax, yMax := getSize(dots)
-	for y := 0; y <= (yMax - yMin); y++ {
-		for x := 0; x <= (xMax - xMin); x++ {
-			if dots[dot{X: x + xMin, Y: y + yMin}] {
+	fmt.Println(xMin, yMin, xMax, yMax)
+	for y := yMin; y <= yMax; y++ {
+		for x := xMin; x <= xMax; x++ {
+			if dots[dot{X: x, Y: y}] {
 				fmt.Print("#")
 			} else {
 				fmt.Print(".")
@@ -106,10 +105,9 @@ func draw(dots map[dot]bool) {
 		}
 		fmt.Println()
 	}
-	fmt.Println()
 }
 
 func main() {
 	solution(readInput("example.txt"))
-	// part01(readInput("input.txt"))
+	solution(readInput("input.txt"))
 }
