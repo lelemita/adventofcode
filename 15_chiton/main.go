@@ -16,12 +16,17 @@ import (
 var cave [][]int
 
 func main() {
-	cave = readInput("input.txt")
-	// cave = readInput("example.txt")
+	// cave = readInput("input.txt")
+	cave = readInput("example.txt")
 	// cave = readInput("example2.txt") // for part01
 	// cave = readInput("example3.txt") // for part02
-	cave = fiveTimes() // for part02
 
+	solution()
+	cave = fiveTimes() // for part02
+	solution()
+}
+
+func solution() {
 	idx := 0
 	pq := priorityQueue.PriorityQueue{&priorityQueue.Item{
 		Axis:  "0,0",
@@ -118,9 +123,8 @@ func fiveTimes() [][]int {
 		realCave = append(realCave, temp)
 	}
 	// 세로로 5회 반복
-	height := len(cave)
 	for i := 1; i < 5; i++ {
-		for r := 0; r < height; r++ {
+		for r := 0; r < len(cave); r++ {
 			temp := []int{}
 			for _, n := range realCave[r] {
 				temp = append(temp, higher(n, i))
@@ -128,20 +132,6 @@ func fiveTimes() [][]int {
 			realCave = append(realCave, temp)
 		}
 	}
-
-	// // 출력
-	// for j, v := range realCave {
-	// 	for i, n := range v {
-	// 		fmt.Print(n)
-	// 		if (i+1)%10 == 0 {
-	// 			fmt.Print(" ")
-	// 		}
-	// 	}
-	// 	if (j+1)%10 == 0 {
-	// 		fmt.Println()
-	// 	}
-	// 	fmt.Println()
-	// }
 	return realCave
 }
 
