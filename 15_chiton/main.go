@@ -16,9 +16,11 @@ import (
 var cave [][]int
 
 func main() {
-	// cave = readInput("example.txt")
 	cave = readInput("input.txt")
-	// cave = readInput("example2.txt")
+	// cave = readInput("example.txt")
+	// cave = readInput("example2.txt") // for part01
+	// cave = readInput("example3.txt") // for part02
+	cave = fiveTimes() // for part02
 
 	idx := 0
 	pq := priorityQueue.PriorityQueue{&priorityQueue.Item{
@@ -100,4 +102,59 @@ func readInput(path string) [][]int {
 		output = append(output, line)
 	}
 	return output
+}
+
+func fiveTimes() [][]int {
+	realCave := [][]int{}
+
+	// 가로로 5회 반복
+	for _, row := range cave {
+		temp := []int{}
+		for i := 0; i < 5; i++ {
+			for _, n := range row {
+				temp = append(temp, higher(n, i))
+			}
+		}
+		realCave = append(realCave, temp)
+	}
+	// 세로로 5회 반복
+	height := len(cave)
+	for i := 1; i < 5; i++ {
+		for r := 0; r < height; r++ {
+			temp := []int{}
+			for _, n := range realCave[r] {
+				temp = append(temp, higher(n, i))
+			}
+			realCave = append(realCave, temp)
+		}
+	}
+
+	// // 출력
+	// for j, v := range realCave {
+	// 	for i, n := range v {
+	// 		fmt.Print(n)
+	// 		if (i+1)%10 == 0 {
+	// 			fmt.Print(" ")
+	// 		}
+	// 	}
+	// 	if (j+1)%10 == 0 {
+	// 		fmt.Println()
+	// 	}
+	// 	fmt.Println()
+	// }
+	return realCave
+}
+
+func higher(n, times int) int {
+	for i := 0; i < times; i++ {
+		n = next(n)
+	}
+	return n
+}
+
+func next(n int) int {
+	if n == 9 {
+		return 1
+	}
+	return n + 1
 }
