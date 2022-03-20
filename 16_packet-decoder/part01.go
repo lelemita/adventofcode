@@ -16,29 +16,6 @@ var qna map[string]int = map[string]int{
 	"A0016C880162017C3686B18A3D4780": 31,
 }
 
-var qna2 map[string]int = map[string]int{
-	"C200B40A82":                 3,
-	"04005AC33890":               54,
-	"880086C3E88112":             7,
-	"CE00C43D881120":             9,
-	"D8005AC2A8F0":               1,
-	"F600BC2D8F":                 0,
-	"9C005AC2F8F0":               0,
-	"9C0141080250320F1802104A08": 1,
-}
-
-var allPackets []string
-
-var opMap map[int]string = map[int]string{
-	0: "sum",
-	1: "product",
-	2: "minmum",
-	3: "maximum",
-	5: "greater",
-	6: "less",
-	7: "equal",
-}
-
 var hexToBinMap map[rune]string
 
 func readHexToBinMap(path string) {
@@ -78,42 +55,22 @@ func binToDecimal(bin string) int {
 
 func main() {
 	readHexToBinMap("binary.txt")
-	for q, a := range qna2 {
+	for q, a := range qna {
 		packet := hexToBinString(q)
-		// fmt.Println("part01:", part01(packet))
-		part01(packet)
-		fmt.Println("part02:", part02(packet), a)
-		fmt.Println()
+		fmt.Println("ans: ", solution(packet), a)
 	}
-
 	// packet := hexToBinString(puzzle)
-	// fmt.Println("part01:", part01(packet))
-	// fmt.Println("part02:", part02(packet))
+	// fmt.Println("ans: ", solution(packet))
 }
 
-func part02(packet string) int {
-	ans := 0
-	stack := []interface{}{}
-	for _, sp := range allPackets {
-		// fmt.Println(sp)
-		tid := binToDecimal(sp[3:6])
-		if tid == 4 {
-			stack = append(stack, readLiteral(sp))
-		} else {
-			stack = append(stack, opMap[tid])
-		}
-	}
+var allPackets []string
 
-	// TODO: stack 뽑아가며 실제 계산하기...
-	fmt.Println(stack)
-	return ans
-}
-
-func part01(packet string) int {
+func solution(packet string) int {
 	ver := 0
 	allPackets = []string{}
 	getAllPackets(&packet)
 	for _, sp := range allPackets {
+		// fmt.Println(sp)
 		ver += binToDecimal(sp[0:3])
 	}
 	return ver
@@ -135,19 +92,6 @@ func getAllPackets(packet *string) *string {
 		allPackets = append(allPackets, getLiteralPacket(packet))
 	}
 	return packet
-}
-
-func readLiteral(packet string) int {
-	num := 0
-	packet = packet[6:]
-	multiflier := len(packet) - len(packet)/5
-	for i := 1; i < len(packet); i++ {
-		if i%5 != 0 {
-			multiflier -= 1
-			num += (int(math.Pow(2, float64(multiflier))) * int(packet[i]-'0'))
-		}
-	}
-	return num
 }
 
 func getLiteralPacket(packet *string) string {
