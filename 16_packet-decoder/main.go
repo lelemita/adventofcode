@@ -78,49 +78,58 @@ func binToDecimal(bin string) int {
 
 func main() {
 	readHexToBinMap("binary.txt")
-	for q, a := range qna2 {
+	for q := range qna2 {
 		packet := hexToBinString(q)
-		// fmt.Println("part01:", part01(packet))
-		part01(packet)
-		fmt.Println("part02:", part02(packet), a)
-		fmt.Println()
+		allPackets = []string{}
+		getAllPackets(&packet)
 	}
-
-	// packet := hexToBinString(puzzle)
-	// fmt.Println("part01:", part01(packet))
-	// fmt.Println("part02:", part02(packet))
 }
 
-func part02(packet string) int {
-	ans := 0
-	stack := []interface{}{}
-	for _, sp := range allPackets {
-		// fmt.Println(sp)
-		tid := binToDecimal(sp[3:6])
-		if tid == 4 {
-			stack = append(stack, readLiteral(sp))
-		} else {
-			stack = append(stack, opMap[tid])
+func calculate(op string, args []int) int {
+	result := 0
+	switch op {
+	case "sum":
+		for _, v := range args {
+			result += v
+		}
+	case "product":
+		result = 1
+		for _, v := range args {
+			result *= v
+		}
+	case "minmum":
+		result := 10
+		for _, v := range args {
+			if v < result {
+				result = v
+			}
+		}
+	case "maximum":
+		for _, v := range args {
+			if v > result {
+				result = v
+			}
+		}
+	case "greater":
+		if args[0] < args[1] {
+			result = 1
+		}
+	case "less":
+		if args[0] > args[1] {
+			result = 1
+		}
+	case "equal":
+		if args[0] == args[1] {
+			result = 1
 		}
 	}
-
-	// TODO: stack 뽑아가며 실제 계산하기...
-	fmt.Println(stack)
-	return ans
-}
-
-func part01(packet string) int {
-	ver := 0
-	allPackets = []string{}
-	getAllPackets(&packet)
-	for _, sp := range allPackets {
-		ver += binToDecimal(sp[0:3])
-	}
-	return ver
+	return result
 }
 
 func getAllPackets(packet *string) *string {
 	tid := binToDecimal((*packet)[3:6])
+	fmt.Println(opMap[tid])
+	ar := []int{}
 	if tid != 4 {
 		label := int((*packet)[6] - '0')
 		switch label {
@@ -130,6 +139,16 @@ func getAllPackets(packet *string) *string {
 		case 1:
 			subs := byCount(packet)
 			allPackets = append(allPackets, subs...)
+		}
+		if len(allPackets) > 0 {
+			args := []int{}
+			for _, p := range allPackets {
+				args = append(args, readLiteral(p))
+			}
+			result := calculate(opMap[tid], args)
+			ar = append(ar, result)
+			allPackets = []string{}
+			fmt.Println(opMap[tid], args, result)
 		}
 	} else {
 		allPackets = append(allPackets, getLiteralPacket(packet))
@@ -151,7 +170,6 @@ func readLiteral(packet string) int {
 }
 
 func getLiteralPacket(packet *string) string {
-	// fmt.Println("lit: ", *packet)
 	lit := (*packet)[:6]
 	for i := 6; i < len(*packet); i += 5 {
 		lit += (*packet)[i : i+5]
@@ -164,9 +182,8 @@ func getLiteralPacket(packet *string) string {
 }
 
 func byCount(packet *string) []string {
-	subs := []string{*packet}
+	subs := []string{}
 	count := binToDecimal((*packet)[7 : 7+11])
-	// fmt.Println("count", count, *packet)
 	*packet = (*packet)[7+11:]
 	for i := 0; i < count; i++ {
 		packet = getAllPackets(packet)
@@ -175,9 +192,8 @@ func byCount(packet *string) []string {
 }
 
 func byLength(packet *string) []string {
-	subs := []string{*packet}
+	subs := []string{}
 	length := binToDecimal((*packet)[7 : 7+15])
-	// fmt.Println("length", length, *packet)
 
 	sub := (*packet)[7+15 : 7+15+length]
 	for len(sub) > 0 {
