@@ -16,16 +16,29 @@ var puzzle string
 
 func main() {
 	fs := strings.Split(puzzle, "\n")
+
+	// PART 01
 	formula := fs[0]
 	for _, f := range fs[1:] {
 		formula = fmt.Sprintf("[%s,%s]", formula, f)
-		formula = part01(formula)
+		formula = react(formula)
 	}
+	fmt.Println("part01:", getMagnitue(formula))
 
-	// 크기 계산
-	fmt.Println(getMagnitue(formula))
-	// fmt.Println(getMagnitue("[[1,2],[[3,4],5]]"), 143)
-	// fmt.Println(getMagnitue("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]"), 3488)
+	// PART 02
+	maxMagn := 0
+	for i := 0; i < len(fs); i++ {
+		for j := 0; j < len(fs); j++ {
+			if i == j {
+				continue
+			}
+			result := getMagnitue(react(fmt.Sprintf("[%s,%s]", fs[i], fs[j])))
+			if result > maxMagn {
+				maxMagn = result
+			}
+		}
+	}
+	fmt.Println("part02:", maxMagn)
 }
 
 func getMagnitue(formula string) int {
@@ -57,12 +70,10 @@ func getMagnitue(formula string) int {
 	return result
 }
 
-func part01(formula string) string {
-	// 멈출때까지 반응
+func react(formula string) string {
 	var didSome bool
 	for {
-		// fmt.Println(formula)
-		didSome, formula = react(formula)
+		didSome, formula = explode(formula)
 		if !didSome {
 			formula, didSome = split(formula)
 			if !didSome {
@@ -73,17 +84,16 @@ func part01(formula string) string {
 	return formula
 }
 
-func react(formula string) (bool, string) {
+func explode(formula string) (bool, string) {
 	count := 0
 	for i, v := range formula {
-		//explode
 		if v == '[' {
 			count += 1
 		} else if v == ']' {
 			count -= 1
 		}
 		if count >= 5 {
-			formula = explode(i, formula)
+			formula = boom(i, formula)
 			return true, formula
 		}
 	}
@@ -101,12 +111,11 @@ func split(formula string) (string, bool) {
 		panic(err)
 	}
 
-	// fmt.Println(bigNum)
 	formula = formula[:idx[0]] + fmt.Sprintf("[%d,%d]", bigNum/2, bigNum/2+bigNum%2) + formula[idx[1]:]
 	return formula, true
 }
 
-func explode(idx int, formula string) string {
+func boom(idx int, formula string) string {
 	// 정규식 쓰는거 ref: https://github.com/BorisLeMeec/adventofcode/blob/main/35/main.go
 	compile, _ := regexp.Compile(`([\[][0-9]*,[0-9]*[\]])`)
 	jdx := compile.FindStringIndex(formula[idx:])
@@ -119,7 +128,6 @@ func explode(idx int, formula string) string {
 	if err != nil {
 		panic(err)
 	}
-	// fmt.Println(pair)
 
 	front := formula[:idx]
 	target := []byte{}
@@ -168,8 +176,6 @@ func explode(idx int, formula string) string {
 	}
 
 	formula = front + "0" + back
-	// fmt.Println()
-	// fmt.Println(front, "0", back)
 	return formula
 }
 
