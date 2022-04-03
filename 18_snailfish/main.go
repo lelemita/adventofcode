@@ -1,48 +1,67 @@
+// 문제: https://adventofcode.com/2021/day/18
+// 실패1: explode 다하고 split...해야했음
+// 참고1: 정규식 사용하는 것: https://github.com/BorisLeMeec/adventofcode/blob/main/35/main.go
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
-// explode 다하고 split...
-// 정규식 사용하는 방식 참고: https://github.com/BorisLeMeec/adventofcode/blob/main/35/main.go
+//go:embed input.txt
+var puzzle string
+
 func main() {
-	// 문자열 합치기
-	// formula := makeFormula()
-
-	fs := []string{
-		"[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]",
-		"[[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]",
-		"[[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]],[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]]",
-		"[[[[[6,7],[6,7]],[[7,7],[0,7]]],[[[8,7],[7,7]],[[8,8],[8,0]]]],[[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]]]",
-	}
-
-	ans := []string{
-		"[[[[0,7],4],[[7,8],[6,0]]],[8,1]]",
-		"[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]",
-		"[[[[6,7],[6,7]],[[7,7],[0,7]]],[[[8,7],[7,7]],[[8,8],[8,0]]]]",
-		"[[[[7,0],[7,7]],[[7,7],[7,8]]],[[[7,7],[8,8]],[[7,7],[8,7]]]]",
-	}
-
-	for i, f := range fs {
-		result := part01(f)
-		fmt.Println(ans[i] == result)
-		if ans[i] != result {
-			fmt.Println(ans[i])
-			fmt.Println(result)
-		}
+	fs := strings.Split(puzzle, "\n")
+	formula := fs[0]
+	for _, f := range fs[1:] {
+		formula = fmt.Sprintf("[%s,%s]", formula, f)
+		formula = part01(formula)
 	}
 
 	// 크기 계산
+	fmt.Println(getMagnitue(formula))
+	// fmt.Println(getMagnitue("[[1,2],[[3,4],5]]"), 143)
+	// fmt.Println(getMagnitue("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]"), 3488)
+}
+
+func getMagnitue(formula string) int {
+	compile, _ := regexp.Compile(`([\[][0-9]*,[0-9]*[\]])`)
+	for {
+		if formula[0] != '[' {
+			break
+		}
+		idx := compile.FindStringIndex(formula)
+		pair := formula[idx[0]:idx[1]]
+		comma := strings.IndexByte(pair, ',')
+		frontNumStr := string(pair[1:comma])
+		backNumStr := string(pair[comma+1 : len(pair)-1])
+		frontNum, err := strconv.Atoi(frontNumStr)
+		if err != nil {
+			panic(err)
+		}
+		backNum, err := strconv.Atoi(backNumStr)
+		if err != nil {
+			panic(err)
+		}
+		num := (frontNum * 3) + (backNum * 2)
+		formula = formula[:idx[0]] + fmt.Sprintf("%d", num) + formula[idx[1]:]
+	}
+	result, err := strconv.Atoi(formula)
+	if err != nil {
+		panic(err)
+	}
+	return result
 }
 
 func part01(formula string) string {
 	// 멈출때까지 반응
 	var didSome bool
 	for {
+		// fmt.Println(formula)
 		didSome, formula = react(formula)
 		if !didSome {
 			formula, didSome = split(formula)
@@ -100,6 +119,7 @@ func explode(idx int, formula string) string {
 	if err != nil {
 		panic(err)
 	}
+	// fmt.Println(pair)
 
 	front := formula[:idx]
 	target := []byte{}
@@ -116,7 +136,7 @@ func explode(idx int, formula string) string {
 			}
 			if findNum {
 				newNum := getReverseNum(target) + frontNum
-				front = front[:i] + fmt.Sprintf("%d", newNum) + front[i+len(target):]
+				front = front[:i-len(target)+1] + fmt.Sprintf("%d", newNum) + front[i+1:]
 				break
 			}
 		}
@@ -148,6 +168,8 @@ func explode(idx int, formula string) string {
 	}
 
 	formula = front + "0" + back
+	// fmt.Println()
+	// fmt.Println(front, "0", back)
 	return formula
 }
 
