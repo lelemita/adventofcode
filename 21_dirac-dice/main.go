@@ -1,5 +1,5 @@
 /*
-	** example -> 739785
+	** example -> 739785, 444356092776315
 	Player 1 starting position: 4
 	Player 2 starting position: 8
 
@@ -26,9 +26,9 @@ func (p *Player) drowDice(t int) {
 	}
 }
 
-func solution() int {
-	A := Player{loc: 2, Score: 0}
-	B := Player{loc: 8, Score: 0}
+func part01(startA, startB int) int {
+	A := Player{loc: startA, Score: 0}
+	B := Player{loc: startB, Score: 0}
 	cnt := 0
 	for true {
 		if cnt%2 == 0 {
@@ -51,5 +51,6 @@ func solution() int {
 }
 
 func main() {
-	fmt.Println(solution())
+	fmt.Println(part01(4, 8))
+	fmt.Println(part01(2, 8))
 }
