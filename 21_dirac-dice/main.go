@@ -12,7 +12,6 @@ package main
 
 import (
 	"fmt"
-	"sync"
 )
 
 type Player struct {
@@ -54,8 +53,6 @@ func part01(startA, startB int) int {
 	return -1
 }
 
-var wg sync.WaitGroup
-var mutex sync.Mutex
 var winCount map[int]int
 
 func (p *Player) clone() Player {
@@ -71,42 +68,64 @@ func (p *Player) move(num int) {
 	}
 }
 
-func (p *Player) SplitUniverse(num int, next Player) {
-	// fmt.Printf("%d (num: %d) loc:%d, Score:%d -> ", p.Index, num, p.loc, p.Score)
-	p.move(num)
-	// fmt.Printf("%d / %d\r\n", p.loc, p.Score)
-	if p.Score >= 21 {
-		mutex.Lock()
-		winCount[p.Index] += 1
-		mutex.Unlock()
+var cache map[string][2]int
+var nums map[int]int
+
+const winScore int = 3
+
+func (p *Player) SplitUniverse(num, cnt int, next Player) {
+	status := fmt.Sprintf("%d_%d_%d_%d_%d", p.Index, p.Score, p.loc, next.Score, next.loc)
+	fmt.Println(num, status)
+	if res, isExist := cache[status]; isExist {
+		fmt.Println(">> ", status)
+		winCount[0] += res[0]
+		winCount[1] += res[1]
 	} else {
-		for _, v := range [27]int{3, 4, 5, 4, 5, 6, 5, 6, 7, 4, 5, 6, 5, 6, 7, 6, 7, 8, 5, 6, 7, 6, 7, 8, 7, 8, 9} {
-			wg.Add(1)
-			clone := next.clone()
-			go clone.SplitUniverse(v, p.clone())
+		p.move(num)
+		if p.Score >= winScore {
+			// winCount[p.Index] += 1
+			res := [2]int{0, 0}
+			res[p.Index] = cnt
+			cache[status] = res
+		} else {
+			for k, cnt := range nums {
+				clone := next.clone()
+				clone.SplitUniverse(k, cnt, p.clone())
+			}
 		}
 	}
-	wg.Done()
 }
 
 func part02(startA, startB int) int {
+	nums = getNums()
+	cache = map[string][2]int{}
 	winCount = map[int]int{0: 0, 1: 0}
 	A := Player{loc: startA, Score: 0, Index: 0}
 	B := Player{loc: startB, Score: 0, Index: 1}
-	// map[3:1 4:3 5:6 6:7 7:6 8:3 9:1]
-	// for _, v := range [27]int{3, 4, 5, 6, 7, 8, 9} {
-	for _, v := range [27]int{3, 4, 5, 4, 5, 6, 5, 6, 7, 4, 5, 6, 5, 6, 7, 6, 7, 8, 5, 6, 7, 6, 7, 8, 7, 8, 9} {
-		wg.Add(1)
+	for k, cnt := range nums {
 		clone := A.clone()
-		go clone.SplitUniverse(v, B.clone())
+		clone.SplitUniverse(k, cnt, B.clone())
 	}
 
-	wg.Wait()
 	fmt.Println("--------------------")
 	for k, v := range winCount {
 		fmt.Println(k, v)
 	}
 	return -1
+}
+
+func getNums() map[int]int {
+	arr := []int{}
+	cnts := map[int]int{}
+	for i := 1; i < 4; i++ {
+		for j := 1; j < 4; j++ {
+			for k := 1; k < 4; k++ {
+				arr = append(arr, i+j+k)
+				cnts[i+j+k] += 1
+			}
+		}
+	}
+	return cnts
 }
 
 func main() {
