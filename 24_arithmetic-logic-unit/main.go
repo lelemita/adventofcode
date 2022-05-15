@@ -75,6 +75,36 @@ func part01() {
 	}
 }
 
+func part02() {
+	for n := 1111111; n <= 9999999; n++ {
+		if hasZero(n) {
+			continue
+		}
+		m := Memory{W: 0, Z: 0}
+		result := []int{}
+		idx := 0
+		for i := 0; i < 14; i++ {
+			s := steps[i]
+			if s.numA > 0 {
+				m.W = getIndexNum(n, 7-idx)
+				idx += 1
+				m.upWard(s)
+			} else {
+				m.W = m.Z%26 + s.numA
+				if m.W < 1 || m.W > 9 {
+					break
+				}
+				m.downWard(s)
+			}
+			result = append(result, m.W)
+		}
+		if m.Z == 0 {
+			fmt.Println(result)
+			break
+		}
+	}
+}
+
 func getIndexNum(num, idx int) int {
 	pow := int(math.Pow10(idx))
 	return (num % pow) / (pow / 10)
@@ -87,4 +117,5 @@ func hasZero(n int) bool {
 
 func main() {
 	part01() // [9 9 9 1 9 6 9 2 4 9 6 9 3 9]
+	part02() // [8 1 9 1 4 1 1 1 1 6 1 7 1 4]
 }
