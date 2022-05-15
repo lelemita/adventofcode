@@ -50,34 +50,34 @@ func part01() {
 		if hasZero(n) {
 			continue
 		}
-		result := []int{}
 		m := Memory{W: 0, Z: 0}
-
-		for i := 14; i > 0; i-- {
-
-			이렇게 하면 안됨. 
-			downward 는 정해진 숫자임
-			그걸 이용하면 9^7 경우만 확인하면 됨
-
-			pow := int(math.Pow10(i))
-			m.W = (n % pow) / (pow / 10)
-
-			s := steps[14-i]
+		result := []int{}
+		idx := 0
+		for i := 0; i < 14; i++ {
+			s := steps[i]
 			if s.numA > 0 {
+				m.W = getIndexNum(n, 7-idx)
+				idx += 1
 				m.upWard(s)
-				result = append(result, m.W)
 			} else {
-				if m.Z%26 != s.numA {
+				m.W = m.Z%26 + s.numA
+				if m.W < 1 || m.W > 9 {
 					break
 				}
 				m.downWard(s)
 			}
+			result = append(result, m.W)
 		}
 		if m.Z == 0 {
-			fmt.Println(n)
+			fmt.Println(result)
 			break
 		}
 	}
+}
+
+func getIndexNum(num, idx int) int {
+	pow := int(math.Pow10(idx))
+	return (num % pow) / (pow / 10)
 }
 
 func hasZero(n int) bool {
@@ -86,9 +86,5 @@ func hasZero(n int) bool {
 }
 
 func main() {
-	for i := 0; i <= 26; i++ {
-
-		fmt.Println(i % 26)
-	}
-	// part01()
+	part01() // [9 9 9 1 9 6 9 2 4 9 6 9 3 9]
 }
