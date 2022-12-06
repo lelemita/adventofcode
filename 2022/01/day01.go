@@ -35,15 +35,15 @@ func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 	lines = append(lines, "")
-	result := sort.IntSlice{}
+	result := []int{}
 	one := 0
 	for _, v := range lines {
 		if len(v) == 0 {
-			if result.Len() < 3 {
+			if len(result) < 3 {
 				result = append(result, one)
 			} else if one > result[0] {
 				result[0] = one
-				result.Sort()
+				sort.Ints(result)
 			}
 			one = 0
 		}
