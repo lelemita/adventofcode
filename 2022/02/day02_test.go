@@ -34,7 +34,7 @@ func TestPart2(t *testing.T) {
 
 func TestPart2Input(t *testing.T) {
 	result := Part2(string(input_day))
-	expected := 0
+	expected := 13433
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
