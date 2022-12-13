@@ -1,5 +1,12 @@
 package common
 
+type Stack[T any] interface {
+	Len() int
+	IsEmpty() bool
+	Push(T)
+	Pop() *T
+}
+
 type stack[T any] struct {
 	data []T
 }
@@ -25,14 +32,20 @@ func (s *stack[T]) Pop() *T {
 	return nil
 }
 
-func NewRuneStack() stack[rune] {
-	return stack[rune]{
+func NewRuneStack() *stack[rune] {
+	return &stack[rune]{
 		data: []rune{},
 	}
 }
 
-func NewIntStack() stack[int] {
-	return stack[int]{
+func NewRuneStackWithData(data []rune) *stack[rune] {
+	return &stack[rune]{
+		data: data,
+	}
+}
+
+func NewIntStack() *stack[int] {
+	return &stack[int]{
 		data: []int{},
 	}
 }
