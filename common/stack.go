@@ -1,32 +1,38 @@
 package common
 
-type runeStack struct {
-	Data []rune
+type stack[T any] struct {
+	data []T
 }
 
-func NewRuneStack() runeStack {
-	return runeStack{
-		Data: []rune{},
-	}
+func (s *stack[T]) Len() int {
+	return len(s.data)
 }
 
-func (s *runeStack) IsEmpty() bool {
-	return len(s.Data) == 0
+func (s *stack[T]) IsEmpty() bool {
+	return s.Len() == 0
 }
 
-func (s *runeStack) Push(obj rune) {
-	s.Data = append(s.Data, obj)
+func (s *stack[T]) Push(obj T) {
+	s.data = append(s.data, obj)
 }
 
-func (s *runeStack) Pop() *rune {
-	if l := len(s.Data); l > 0 {
-		result := s.Data[l-1]
-		s.Data = s.Data[:l-1]
+func (s *stack[T]) Pop() *T {
+	if l := len(s.data); l > 0 {
+		result := s.data[l-1]
+		s.data = s.data[:l-1]
 		return &result
 	}
 	return nil
 }
 
-func (s *runeStack) CopyData() []rune {
-	return s.Data
+func NewRuneStack() stack[rune] {
+	return stack[rune]{
+		data: []rune{},
+	}
+}
+
+func NewIntStack() stack[int] {
+	return stack[int]{
+		data: []int{},
+	}
 }
