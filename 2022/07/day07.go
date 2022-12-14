@@ -20,16 +20,19 @@ type Node struct {
 	Ls   []string
 }
 
+var tooBigDirs = map[string]bool{}
+var nodeMap = map[string]Node{}
+
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	tooBigDirs := map[string]bool{}
+	lines = append(lines, "$ cd end")
 
 	// read
-	nodeMap := map[string]Node{}
 	oldDir := "/"
 	newDir := ""
 	ls := []string{}
+	lsSum := 0
 	for i := 0; i < len(lines); i++ {
 		if n, _ := fmt.Sscanf(lines[i], "$ cd %s", &newDir); n > 0 {
 			if oldDir != ".." {
@@ -37,10 +40,14 @@ func Part1(input string) int {
 					Size: 0,
 					Ls:   ls,
 				}
+				if lsSum > maximum {
+					tooBigDirs[oldDir] = true
+				}
 			}
 			oldDir = newDir
 		} else if lines[i] == "$ ls" {
 			ls = []string{}
+			lsSum = 0
 		} else {
 			var sizeStr, name string
 			fmt.Sscanf(lines[i], "%s %s", &sizeStr, &name)
@@ -52,17 +59,29 @@ func Part1(input string) int {
 			}
 			nodeMap[name] = Node{Size: size}
 			ls = append(ls, name)
-			if size >= maximum {
-				tooBigDirs[oldDir] = true
-			}
+			lsSum += size
 		}
 	}
 
 	// find
+	result := 0
 	for name, node := range nodeMap {
-
+		if node.Size == 0 {
+			if temp := getSize(name); temp < maximum {
+				result += temp
+			}
+		}
 	}
-	return 0
+	return result
+}
+
+func getSize(name string) int {
+	node := nodeMap[name]
+	result := node.Size
+	for _, nm := range node.Ls {
+		result += getSize(nm)
+	}
+	return result
 }
 
 func Part2(input string) int {
