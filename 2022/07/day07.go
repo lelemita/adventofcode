@@ -29,13 +29,15 @@ func Part1(input string) int {
 	lines = append(lines, "$ cd end")
 
 	// read
-	oldDir := "/"
+	oldDir := ""
 	newDir := ""
 	ls := []string{}
 	lsSum := 0
 	for i := 0; i < len(lines); i++ {
-		if n, _ := fmt.Sscanf(lines[i], "$ cd %s", &newDir); n > 0 {
-			if oldDir != ".." {
+		if lines[i] == "$ ls" {
+			continue
+		} else if n, _ := fmt.Sscanf(lines[i], "$ cd %s", &newDir); n > 0 {
+			if _, isExist := nodeMap[oldDir]; !isExist {
 				nodeMap[oldDir] = Node{
 					Size: 0,
 					Ls:   ls,
@@ -43,23 +45,27 @@ func Part1(input string) int {
 				if lsSum > maximum {
 					tooBigDirs[oldDir] = true
 				}
+				ls = []string{}
+				lsSum = 0
 			}
-			oldDir = newDir
-		} else if lines[i] == "$ ls" {
-			ls = []string{}
-			lsSum = 0
+
+			if newDir == ".." {
+				idx := strings.LastIndex(oldDir, "/")
+				oldDir = oldDir[:idx]
+			} else {
+				oldDir = fmt.Sprintf("%s/%s", oldDir, newDir)
+			}
 		} else {
 			var sizeStr, name string
 			fmt.Sscanf(lines[i], "%s %s", &sizeStr, &name)
-			size := 0
-			if sizeStr != "dir" {
-				fileSize, err := strconv.Atoi(sizeStr)
-				common.PanicIfErr(err)
-				size = fileSize
-			}
-			nodeMap[name] = Node{Size: size}
+			name = fmt.Sprintf("%s/%s", oldDir, name)
 			ls = append(ls, name)
-			lsSum += size
+			if sizeStr != "dir" {
+				size, err := strconv.Atoi(sizeStr)
+				common.PanicIfErr(err)
+				nodeMap[name] = Node{Size: size}
+				lsSum += size
+			}
 		}
 	}
 
@@ -67,8 +73,9 @@ func Part1(input string) int {
 	result := 0
 	for name, node := range nodeMap {
 		if node.Size == 0 {
-			if temp := getSize(name); temp < maximum {
-				result += temp
+			oneDirSize := getSize(name)
+			if oneDirSize <= maximum {
+				result += oneDirSize
 			}
 		}
 	}
