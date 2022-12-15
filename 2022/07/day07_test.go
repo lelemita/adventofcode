@@ -36,21 +36,21 @@ func TestPart1Input(t *testing.T) {
 	}
 }
 
-//func TestPart2(t *testing.T) {
-//	result := Part2(string(input_test))
-//	expected := 0
-//	if result != expected {
-//		t.Errorf("Result is incorrect, got: %v, want: %v.", result, expected)
-//	}
-//}
+func TestPart2(t *testing.T) {
+	result := Part2(string(input_test))
+	expected := 24933642
+	if result != expected {
+		t.Errorf("Result is incorrect, got: %v, want: %v.", result, expected)
+	}
+}
 
-//func TestPart2Input(t *testing.T) {
-//	result := Part2(string(input_day))
-//	expected := 0
-//	if result != expected {
-//		t.Errorf("Result is incorrect, got: %v, want: %v.", result, expected)
-//	}
-//}
+func TestPart2Input(t *testing.T) {
+	result := Part2(string(input_day))
+	expected := 2481982
+	if result != expected {
+		t.Errorf("Result is incorrect, got: %v, want: %v.", result, expected)
+	}
+}
 
 func BenchmarkPart1(b *testing.B) {
 	for i := 0; i < b.N; i++ {

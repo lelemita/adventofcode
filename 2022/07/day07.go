@@ -23,7 +23,7 @@ type Node struct {
 var tooBigDirs = map[string]bool{}
 var nodeMap = map[string]Node{}
 
-func Part1(input string) int {
+func read(input string) {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 	lines = append(lines, "$ cd end")
@@ -68,6 +68,10 @@ func Part1(input string) int {
 			}
 		}
 	}
+}
+
+func Part1(input string) int {
+	read(input)
 
 	// find
 	result := 0
@@ -92,10 +96,21 @@ func getSize(name string) int {
 }
 
 func Part2(input string) int {
-	// input = strings.TrimSuffix(input, "\n")
-	// lines := strings.Split(input, "\n")
-	return 0
+	read(input)
+	need := getSize("//") - 40_000_000
 
+	result := 70_000_000
+	for name, node := range nodeMap {
+		if node.Size == 0 {
+			oneDirSize := getSize(name)
+			if oneDirSize >= need {
+				if oneDirSize < result {
+					result = oneDirSize
+				}
+			}
+		}
+	}
+	return result
 }
 
 func main() {
